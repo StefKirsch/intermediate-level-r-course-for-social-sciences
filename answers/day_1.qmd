@@ -1,0 +1,820 @@
+---
+format: 
+  revealjs: # for presentations
+    theme: styles/custom.scss
+    smaller: true # smaller font
+    scrollable: true # scrollable pages
+    slide-level: 3  # Give all headings down to h3 their own slide
+execute: # code block execution
+  echo: true
+  eval: true # show code lines with output per code line
+  output: true
+editor: visual
+---
+
+# Intermediate-level R Course for Social Sciences - Day 1
+
+------------------------------------------------------------------------
+
+Links you might need for the day:
+
+-   [Workshop GitLab Repository](https://gitlab.uvt.nl/tsb-rst/intermediate-level-r-course-for-social-sciences)
+-   [Collaborative Document](https://codimd.carpentries.org/gHEKZjDIS12R6YAXIYKnMQ?both)
+
+## 1. Introduction
+
+### 1.1 Why learn R?
+
+-   **R** is one of the most popular programming languages for Social Sciences and Humanities and also popular in many other fields.
+-   **R** can connect to spreadsheets, databases, and many other data formats, either from your computer from the web.
+-   **R** works on data of all shapes and sizes.
+-   **R** is designed for data analysis and comes with special data structures and data types such as *missing data* and *categorical data*.
+-   **R** produces high-quality and highly customizeable graphics.
+-   **R** is interdisciplinary and extensible with 10,000+ packages that can be installed to extend its capabilities (think of data merging, app development, web scraping etc.)
+
+### 1.2 Why learn R ***better***?
+
+-   When you are proficient in **R** you can...
+    -   Automate: No (or very little) clicking required and you can reuse your code (e.g. for several datasets of a larger study).
+    -   Make things clear: Written code (plus documentation) makes it 100% clear for others what you do and why (and most importantly: to your future self!!)
+    -   Reproduce: Anyone (including you!) can run your code again and reproduce your workflow.
+    -   Reuse: If anyone (including you!) has a similar project in the future you can use the code again (or just parts of it)
+    -   With some complementary tools such as **Git**, you can easily **collaborate** on projects within teams of **any size**.
+
+> Writing code in **R** makes these things *possible* but not *inevitable*! It is still up to you to learn how to write good code and follow good practices so that all of the above become reality 🌈.
+
+## 2. Version control with Git and GitLab
+
+------------------------------------------------------------------------
+
+### Your Experiences {.center}
+
+#### How do you save intermediate versions of your code?
+
+#### How do you backup your code?
+
+#### How do you work together with others on the same file(s)?
+
+#### How do you document your code?
+
+------------------------------------------------------------------------
+
+### Ever had one of these?
+
+-   You have a “file history” (like `scriptV1.R`, `scriptV2.R`) but it’s impossible to trace back what changed when and why …
+-   Your code breaks, you have no idea why … But the deadline is tomorrow …
+-   You work on the code in a group, and you are e-mailing the code back and forth …
+-   You do have a version of your code in the cloud, but everyone also has versions with different changes locally …
+-   You come back to your code one year later. Which was the latest working version and how do you get the script to run again??
+
+------------------------------------------------------------------------
+
+![Adapted from © [Software Carpentry](http://software-carpentry.org/) under CC BY 4.0 license](images/notebook_figures/hacks_vs_properly_implemented.png)
+
+### Version "Control" during my PhD ...
+
+![](images/notebook_figures/old_versioning.png)
+
+### ... VS Now
+
+![](images/notebook_figures/new_versioning.png)
+
+------------------------------------------------------------------------
+
+![Illustration by Scriberia. Used under a CC-BY 4.0 licence. DOI: 10.5281/zenodo.3332807.](images/notebook_figures/version_control_Scriberia_cc_by_4.0.png)
+
+------------------------------------------------------------------------
+
+### Version Control with Git allows you to ...
+
+-   … describe versions with meaningful explanations
+-   … back up your code safely in the cloud
+-   … go back to earlier (working) versions
+-   … collaborate with others in a **rewarding** way
+-   … have one central “landing page” for your work
+-   … document your work
+-   … help yourself and others to reproduce your work
+-   … publish your code as part of your research output and specify if and how others can use it
+-   … find peers around the globe who work on similar topics
+-   … and probably some more that we forgot 😊
+
+### Keeping Track of Changes
+
+![](images/notebook_figures/keeping_track_of_changes.png)
+
+### Playing back different sets of changes on the base document
+
+![](images/notebook_figures/playing_back_changes.png)
+
+### Incorporating two sets of changes into the same base document
+
+![](images/notebook_figures/incorporating_changes.png)
+
+## Hands On!
+
+### Let's set you up for the rest of the course.
+
+If you haven't cloned the repository with the course material yet, please let the helpers know now.
+
+1.  Open the file `intermediate-r-course.Rproj` file in RStudio. You can do that in RStudio or via your file explorer.
+
+2.  Open the file `day_1.qmd`.
+
+3.  Make sure Visual Mode is selected on the top left.
+
+4.  If you are being asked to install missing dependencies, you can do that now.
+
+::: callout-tip
+We will be using this project for the remainder of the course. Make sure to keep in open in a separate R session.
+:::
+
+### Creating a new project
+
+1.  Go to **GitLab** (<https://gitlab.uvt.nl/>)
+
+    a.  Click **New Project**.
+    b.  Select **Blank Project**.
+    c.  Enter a project name. Let's call this one `Arithmetic [your name]`.
+    d.  As the namespace, select `tiu-training/r-intermediate-course-2025`.
+
+    ::: callout-tip
+    Namespaces are used to organize projects within teams, departments etc. You should only use your personal namespace for very small projects, because that namespace will be deleted as soon as you leave TiU.
+    :::
+
+    e.  Click **Create project**
+    f.  Click on "Code" and copy the URL for **Cloning** the project with **HTTPS**.
+
+### Creating a new project (continued)
+
+2.  In **RStudio**
+    a.  Create new project with version control (git) in Rstudio.\
+        (File -\> New Project -\> Version Control -\> Git)
+    b.  Paste the URL to your Project on GitLab (make sure it ends in `.git`)
+    c.  Check the box "Open in new session" ![](images/notebook_figures/new_session.png){width="250"}
+
+::: callout-important
+You will be using the repository you are about to create for the rest of the course, including day 2.\
+\
+So make sure to put the folder it in a place where you can find it again!
+:::
+
+### Note
+
+::: callout-tip
+If you already have an existing project, you need to initialize the git project via the command line\
+`git init`
+
+`git remote add origin [HTTPS_gitlab_address.git]`
+
+`git stage .`
+
+`git commit -m "Initial commit"`
+
+`git push --set-upstream origin main`
+:::
+
+### Let's put a New R Script in Version Control
+
+```{r eval=FALSE}
+# A simple arithmetic function in R
+perform_arithmetic <- function(number1, number2, operation) {
+  if (operation == "add") {
+    return(number1 + number2)
+  } else if (operation == "subtract") {
+    return(number1 - number2)
+  }
+}
+
+# Calculate results
+perform_arithmetic(10, 5, "add")
+perform_arithmetic(10, 5, "subtract")
+```
+
+### The 4 Steps to a New Version
+
+Make sure you’re on the correct **branch** and you've **pulled**. (you can always pull again if you’re unsure)
+
+1.  **Make** and **Save** your changes
+
+2.  **Stage** the changes you want in the next version
+
+3.  **Commit** using a descriptive **Commit Message**.
+
+4.  **Push** (to the remote repository)
+
+You can all of these with the git terminal or directly in the RStudio Graphical Interface (see [here](https://docs.posit.co/ide/user/ide/guide/tools/version-control.html#integrations)).
+
+### Let's add multiplication
+
+``` {.r code-line-numbers="7-8" eval="FALSE"}
+# A simple arithmetic function in R
+perform_arithmetic <- function(number1, number2, operation) {
+  if (operation == "add") {
+    return(number1 + number2)
+  } else if (operation == "subtract") {
+    return(number1 - number2)
+  } else if (operation == "multiply") {
+    return(number1 * number2)
+  }
+}
+
+# Calculate results
+perform_arithmetic(10, 5, "add")
+perform_arithmetic(10, 5, "subtract")
+```
+
+### Let's add division
+
+``` {.r code-line-numbers="9-10" eval="FALSE"}
+# A simple arithmetic function in R
+perform_arithmetic <- function(number1, number2, operation) {
+  if (operation == "add") {
+    return(number1 + number2)
+  } else if (operation == "subtract") {
+    return(number1 - number2)
+  } else if (operation == "multiply") {
+    return(number1 * number2)
+  } else if (operation == "divide") {
+    return(number1 / number2)
+  }
+}
+
+# Calculate results
+perform_arithmetic(10, 5, "add")
+perform_arithmetic(10, 5, "subtract")
+```
+
+Don't commit just yet!
+
+### Commit messages
+
+::: callout-tip
+Make sure every commit just does **one thing** and not **several unrelated** things. This will be hard in beginning, but don't worry about it too much.
+:::
+
+#### Rules of thumb 👍
+
+-   **WHAT** and **WHY**
+
+-   Not too general ("*Update code*", "*Update file xyz*")
+
+-   Instead of **AND**, split it up in two commits
+
+-   Changes in several locations (and even files) can be ok! E.g. "*Rename variable for clarity.*"
+
+-   Present tense/imperative
+
+## What would be a good commit message for our change?
+
+### Let's handle invalid inputs and add calls for all the functionality we added
+
+``` {.r code-line-numbers="11-12,19-21" eval="FALSE"}
+# A simple arithmetic function in R
+perform_arithmetic <- function(number1, number2, operation) {
+  if (operation == "add") {
+    return(number1 + number2)
+  } else if (operation == "subtract") {
+    return(number1 - number2)
+  } else if (operation == "multiply") {
+    return(number1 * number2)
+  } else if (operation == "divide") {
+    return(number1 / number2)
+  } else {
+    return("Invalid operation")
+  }
+}
+
+# Calculate results
+perform_arithmetic(10, 5, "add")
+perform_arithmetic(10, 5, "subtract")
+perform_arithmetic(10, 5, "multiply")
+perform_arithmetic(10, 5, "divide")
+perform_arithmetic(10, 5, "monkey stuff")
+```
+
+How should we handle these changes with version control?
+
+### How NOT to work together: Committing on the same branch
+
+![Copyright © The [Turing Way](https://github.com/the-turing-way/the-turing-way) Community, adapted and licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)](images/notebook_figures/branches_wrong.png)
+
+### How to work together: Issues and Merge Requests
+
+![Copyright © The [Turing Way](https://github.com/the-turing-way/the-turing-way) Community, adapted and licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)](images/notebook_figures/branches.png)
+
+### Workflow for working together (Issues, Merge Requests, Merging)
+
+Make sure you’re on the correct **branch** and you've **pulled**. (you can always pull again if you’re unsure)
+
+1.  Invite your colleague and give them developer rights (first time only)
+2.  Create a new **Issue** (= Todo) in *GitLab*
+    a.  Go to the project page and click on **New Issue.**
+    b.  Think of what (feature, bug etc.) you want to work on.
+    c.  Add a clear description (Markdown compatible, including check boxes etc.)
+    d.  Scroll down and **Create** **the Issue**.
+3.  Create a **Merge Request** (Branch) from the issue in *GitLab*
+4.  **Pull** new branch in *RStudio*
+5.  [Make sure you’re on the right branch]{.underline}
+6.  Do your changes (this can be done several commits)
+
+### Working Together (continued)
+
+7.  Repeat this until you are done with the Issue
+8.  In *GitLab*
+    a.  Go to **Merge Requests**
+    b.  Select your Merge Request
+    c.  Click "**Mark as Ready**"
+    d.  Click "**Merge"**
+9.  If you get a merge conflict, you can select which changes you want to keep. Best go through these together with your team members.
+
+Now you have your changes on the main branch… let’s hope there are no bugs in them 😆
+
+## Hands On!
+
+### Let's work together and each add some new functionality!
+
+1.  Split up into pairs.
+2.  Elevate each other to *Developer* roles in your respective repositories. Pick one repository for the exercise.
+
+### Person 1/Repo owner: Add a default operation
+
+``` {.r code-line-numbers="2,17" eval="FALSE"}
+# A simple arithmetic function in R
+perform_arithmetic <- function(number1, number2, operation = "add") {
+  if (operation == "add") {
+    return(number1 + number2)
+  } else if (operation == "subtract") {
+    return(number1 - number2)
+  } else if (operation == "multiply") {
+    return(number1 * number2)
+  } else if (operation == "divide") {
+    return(number1 / number2)
+  } else {
+    return("Invalid operation")
+  }
+}
+
+# Calculate results
+perform_arithmetic(10, 5)
+perform_arithmetic(10, 5, "add")
+perform_arithmetic(10, 5, "subtract")
+perform_arithmetic(10, 5, "multiply")
+perform_arithmetic(10, 5, "divide")
+perform_arithmetic(10, 5, "monkey stuff")
+```
+
+### Person 2/invited: Add exponent functionality
+
+``` {.r code-line-numbers="11-12,23" eval="FALSE"}
+# A simple arithmetic function in R
+perform_arithmetic <- function(number1, number2, operation) {
+  if (operation == "add") {
+    return(number1 + number2)
+  } else if (operation == "subtract") {
+    return(number1 - number2)
+  } else if (operation == "multiply") {
+    return(number1 * number2)
+  } else if (operation == "divide") {
+    return(number1 / number2)
+  } else if (operation == "exponent") {
+    return(number1^number2)
+  } else {
+    return("Invalid operation")
+  }
+}
+
+# Calculate results
+perform_arithmetic(10, 5, "add")
+perform_arithmetic(10, 5, "subtract")
+perform_arithmetic(10, 5, "multiply")
+perform_arithmetic(10, 5, "divide")
+perform_arithmetic(10, 5, "exponent")
+perform_arithmetic(10, 5, "monkey stuff")
+```
+
+### Exercise: Work together and each add some new functionality!
+
+1.  Work with *Issues* and *Merge Requests* to both add some unrelated new functionality.
+2.  *Merge* both merge requests and see what happens!
+3.  Check the *Commit* History on GitLab.
+
+### Person 1/Repo owner: Add n-root operation
+
+``` {.r code-line-numbers="13,14,27" eval="FALSE"}
+# A simple arithmetic function in R
+perform_arithmetic <- function(number1, number2, operation = "add") {
+  if (operation == "add") {
+    return(number1 + number2)
+  } else if (operation == "subtract") {
+    return(number1 - number2)
+  } else if (operation == "multiply") {
+    return(number1 * number2)
+  } else if (operation == "divide") {
+    return(number1 / number2)
+  } else if (operation == "exponent") {
+    return(number1^number2)
+  } else if (operation == "root") {
+    return(number1^(1/number2)
+  } else {
+    return("Invalid operation")
+  }
+}
+
+# Calculate results
+perform_arithmetic(10, 5)
+perform_arithmetic(10, 5, "add")
+perform_arithmetic(10, 5, "subtract")
+perform_arithmetic(10, 5, "multiply")
+perform_arithmetic(10, 5, "divide")
+perform_arithmetic(10, 5, "exponent")
+perform_arithmetic(10, 5, "root")
+perform_arithmetic(10, 5, "monkey stuff")
+```
+
+### Person 2/invited: Add a wrapper for square
+
+``` {.r code-line-numbers="18-22,33" eval="FALSE"}
+# A simple arithmetic function in R
+perform_arithmetic <- function(number1, number2, operation = "add") {
+  if (operation == "add") {
+    return(number1 + number2)
+  } else if (operation == "subtract") {
+    return(number1 - number2)
+  } else if (operation == "multiply") {
+    return(number1 * number2)
+  } else if (operation == "divide") {
+    return(number1 / number2)
+  } else if (operation == "exponent") {
+    return(number1^number2)
+  } else {
+    return("Invalid operation")
+  }
+}
+
+perform_sqare <- function(number1) {
+  return(
+    perform_arithmetic(number1, 2, "exponent")
+  )
+}
+
+# Calculate results
+perform_arithmetic(10, 5)
+perform_arithmetic(10, 5, "add")
+perform_arithmetic(10, 5, "subtract")
+perform_arithmetic(10, 5, "multiply")
+perform_arithmetic(10, 5, "divide")
+perform_arithmetic(10, 5, "exponent")
+perform_arithmetic(10, 5, "monkey stuff")
+
+perform_sqare(10)
+```
+
+### GitLab VS GitHub
+
+::: columns
+::: {.column width="50%"}
+#### GitLab
+
+![](https://images.ctfassets.net/xz1dnu24egyd/3FbNmZRES38q2Sk2EcoT7a/a290dc207a67cf779fc7c2456b177e9f/press-kit-icon.svg){width="145"}
+
+-   Names
+    -   Projects/Repositories
+    -   Groups
+    -   Issues
+    -   Merge Requests
+-   Self-hosted by TiU
+:::
+
+::: {.column width="50%"}
+#### GitHub
+
+![](https://raw.githubusercontent.com/gist/johan/1007813/raw/a25829510f049194b6404a8f98d22978e8744a6f/octocat.svg){width="150"}
+
+-   Names
+    -   Repositories
+    -   Projects
+    -   Issues
+    -   Pull Requests (PR)
+-   Owned by Microsoft
+:::
+:::
+
+### Version Control for your Manuscript
+
+::: callout-tip
+Git does not only work with code, but anything that’s plain text (i.e. LaTeX, Markdown, etc.)
+:::
+
+You can even build your entire paper or thesis in RStudio with version control. Take a look at
+
+-   Authoring manuscripts in [Quarto](https://quarto.org/docs/manuscripts/authoring/rstudio.html)
+
+-   the [WORCS](https://github.com/nehamoopen/workshop-worcs-bookdown) package
+
+## 3. Notebooks
+
+Before we get into specific of R functions, let's have a look at the formats we can to write R scripts.
+
+1.  [R script](standard_r_script.R)
+2.  [R notebook](r_notebook.qmd)
+
+## 4. Data Processing and Cleaning
+
+### 4.1 Exploratory Data Analysis (EDA)
+
+The R `tidyverse` is amazing for inspecting, visualizing, processing and cleaning data. One package that really shines here is `dplyr`. If you want to to learn more about `dplyr`, check out [R for Data Science](https://r4ds.hadley.nz/)!
+
+```{r}
+library(dplyr)
+```
+
+Let's take it for a spin on a synthetic dataset for health data recorded by fitness trackers. The dataset contains participants' heart rate over the course of several weeks.
+
+```{r}
+# this is a function we wrote for this course that allows you to generate synthetic data.
+source("R/create_synth_data.R")
+
+df_fitness <- create_fitness_data(num_participants = 10)
+```
+
+We can preview the data in different ways, and also quickly get a feeling for what we are dealing with.
+
+```{r code-along 1}
+df_fitness # this is equivalent to print(df_fitness)
+
+str(df_fitness)
+```
+
+Let's take a closer look at the observations of this dataset. Let's do this with the participant with `study_number == 1`.
+
+```{r code-along 2}
+df_fitness |> 
+  filter(
+    study_number == 1  # notice how RStudio suggests column names here for you, which is very handy
+  ) |> 
+  group_by(week_id) |> 
+  slice_head(n = 5) # same as head, but for groups
+
+```
+
+Looks like there are two weeks and the intervention took place in week 2. This is actually true for the other patients as well!
+
+Let's take a look at the average `heart_rate` per `week_id`. We can do this with the dplyr functions `select()`, `group_by()` and `summarize()`.
+
+```{r code-along 3}
+
+df_fitness |> 
+  select(
+    week_id, 
+    heart_rate
+  ) |> 
+  group_by(
+    week_id
+  ) |> 
+  summarize(
+    heart_rate_avg = mean(heart_rate, na.rm = TRUE)
+  )
+```
+
+So, at first glance, it looks like the intervention week came with a slightly lower heart rate.
+
+> Note: If we don't use the `na.rm = TRUE` argument, we're getting NA as the result. This means that there are some values missing, because the participants weren't wearing their trackers at that time. We will discuss the implications of this in a moment!
+
+Let's check how the individual participants react to the intervention. For this we can use `ggplot`, which is also covered in [R for Data Science](https://r4ds.hadley.nz/).
+
+```{r}
+library(ggplot2)
+
+df_fitness |>
+  # let's look at the first 4 participants
+  filter(study_number %in% c(1,2,3,4)) |> 
+  ggplot(aes(
+    x = Datetime,
+    y = heart_rate
+  )) +
+  # Heart rate line
+  geom_point() + 
+   # Trend line
+  geom_smooth() +
+  labs(
+    title = "Heart Rate Over Time by Participant",
+    x = "Datetime",
+    y = "Average Heart Rate (bpm)"
+  ) +
+  # Separate facet for each participant
+  facet_wrap(
+    ~study_number, 
+    ncol = 2
+    )
+```
+
+We find that some participants react with a higher heart rate, some with a lower, and for some it doesn't change at all!
+
+> The dataset already has a column that identifies compliant VS non-compliant days.We consider a day to be compliant if the participant wore the fitness tracker for more than half the 2 hours we consider per day.
+
+Let's create a visualization that shows how compliant the different participants are per week.
+
+```{r code along 4}
+df_fitness |>
+  group_by(
+    study_number,
+    week_id
+  ) |>
+  summarize(
+    compliant_days_percent = mean(is_compliant_day) * 100
+    ) |>
+  ggplot(aes(
+    x = factor(study_number), # Convert to factor for discrete categories
+    y = compliant_days_percent,
+    fill = factor(week_id) # Convert to factor for discrete categories
+  )) +
+  geom_col(
+    position = "dodge"
+    ) +
+  labs(
+    title = "Compliant Days Percent by Study Number and Week ID",
+    x = "Study Number",
+    y = "Compliant Days Percent",
+    fill = "Week ID"
+  )
+```
+
+We notice that some participants and weeks are more compliant than others (as is to be expected).
+
+**Problem**: Do participants selectively wear their tracker, depending on what they plan for the day (go for a walk, go to the gym?)
+
+Let's take a look at the heart rate of compliant VS non-compliant days:
+
+```{r}
+df_fitness |>
+   ggplot(aes(
+    x = factor(is_compliant_day), 
+    y = heart_rate
+  )) +
+  geom_boxplot() +
+  labs(
+    title = "Heart rate by daily compliance",
+    x = "Day was compliant",
+    y = "Heart rate"
+  )
+
+```
+
+It looks like compliant days come with a lower median heart rate, which could indicate a bias.
+
+### 4.2 Adding helper columns with `mutate()`
+
+To avoid weeks that could have this bias, let's reject weeks that have **less than 4 compliant** **week days**, as we consider those to be the most "routine".
+
+We can easily do this with the help of helper columns. Helper columns are awesome whenever you want to use information that is already implicitly contained in your data, but it's not quite accessible enough to do processing with.
+
+For example
+
+-   All the information we can get out of the **datetime** (time of day, weekday, weekend, season etc.)
+
+-   **Questionnaires**: How a participant is using the likert scales (extreme, more towards the middle, etc.)
+
+-   **Age**: Age groups
+
+-   etc.
+
+To determine if a day is a weekday or not we can use `lubridate::wday()`.
+
+Let's install and load `lubridate`.
+
+```{r code-along 5}
+#install.packages("lubridate")
+library(lubridate)
+```
+
+And take it for a spin:
+
+```{r code-along 6}
+now()
+
+wday(now(), week_start = "Monday")
+```
+
+Let's add the helper columns and see how we can remove the non-compliant weeks:
+
+```{r code-along 7}
+
+n_obs = 120 # minutes
+
+df_compl <- df_fitness |>
+  mutate(
+    day = as.Date(Datetime),
+    weekday = wday(Datetime, week_start = "Monday"),
+    is_weekday = weekday %in% c(1, 2, 3, 4, 5),
+    is_compliant_weekday = is_weekday & is_compliant_day
+    ) |> 
+  group_by(
+    study_number, 
+    week_id
+    ) |> 
+  mutate(
+    n_compliant_weekday = sum(is_compliant_weekday)/n_obs,
+    is_compliant_week = n_compliant_weekday >= 4,
+  ) |> 
+  filter(!is_compliant_week)
+```
+
+And we see that this removed the trend of higher heart rate for non-compliant days, nice!
+
+```{r, eval=FALSE}
+df_compl |> 
+ ggplot(aes(
+    x = factor(is_compliant_day), 
+    y = heart_rate
+  )) +
+  geom_boxplot() +
+  labs(
+    title = "Heart rate by daily compliance",
+    x = "Day was compliant",
+    y = "Heart rate"
+  )
+```
+
+### 4.2 Labeled data with `labelled()` and `haven()`
+
+Data from surveys is often labelled:
+
+-   **Variable names**: Shorthand for the variable
+
+-   **Variable labels**: Long name of the variable, question that was asked
+
+-   **Value labels**: 1 = male, 2 = female, etc.
+
+With R you can
+
+-   Work with labeled data
+
+-   rRad in labelled `.sav` files from SPSS
+
+-   Do data manipulation based on the names, values or labels interchangeably.
+
+```{r}
+#install.packages("haven")
+#install.packages("labelled")
+
+library(haven)
+library(labelled)
+```
+
+Let's look at a synthetic survey dataset:
+
+```{r}
+survey_data <- create_survey_data()
+
+survey_data
+```
+
+```{r code-along 8}
+var_label(survey_data)
+```
+
+And we can also inspect the value labels (or levels):
+
+```{r code-along 9}
+survey_data$education |> levels()
+```
+
+::: callout-important
+## Note
+
+Value levels will always be ranked ascending from 1. Starting from 0 is **not** possible in R.
+:::
+
+We can easily filter based on the verbatim values or on the numeric values (with the help of `as.integer()`).
+
+```{r code-along 10}
+survey_data |> 
+  filter(
+    education == "High School",
+    job_satisfaction == "Fully Agree",
+    as.integer(mental_health) == 5
+    )
+
+```
+
+#### Exercise
+
+Get the subset of **females** with **high job satisfaction** (\> 3), but **low and average mental health** (\<= 3). Try to use both **numeric** and **verbatim** values for the value labels.
+
+```{r answer 3}
+survey_data |> 
+  filter(
+    gender == "Female",
+    as.integer(job_satisfaction) > 3,
+    as.integer(mental_health) <= 3
+    )
+```
+
+If you maintain your labeled dataset well, you can also use R to automatically generate a codebook for you:
+
+```{r code-along 11}
+#install.packages("codebook")
+library(codebook)
+
+codebook_table(survey_data)
+```

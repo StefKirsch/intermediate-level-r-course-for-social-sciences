@@ -1,0 +1,1049 @@
+---
+format: 
+    html:
+        toc: true
+        toc-title: Day 2 Topics
+        toc-location: left
+        toc-depth: 3
+        number-sections: true
+        number-depth: 3
+        number-offset: 2
+        shift-heading-level-by: -1
+execute: # code block execution
+  echo: true
+  eval: false
+editor: visual
+---
+
+# Intermediate-level R Course for Social Sciences - Day 2 {.unnumbered}
+
+Links you might need for the day:
+
+-   [Workshop GitLab Repository](https://gitlab.uvt.nl/tsb-rst/intermediate-level-r-course-for-social-sciences)
+-   [Collaborative Document](https://codimd.carpentries.org/gHEKZjDIS12R6YAXIYKnMQ?both)
+
+## 👷‍♀️ Dependency management
+
+Consider some code I wrote at the start of my Ph.D. a few years ago.
+
+```{r}
+# Prepare enviroment
+library("ggplot2")
+
+# ggplot2 deprecated size arugments
+mtcars |> ggplot(aes(
+    x = wt,
+    y = mpg
+)) +
+    geom_smooth(
+        method = "lm",
+        size = 2
+    ) +
+    theme(
+        panel.background = element_rect(fill = NA),
+        panel.grid.major = element_line(
+            color = "black",
+            size = 0.15
+        )
+    )
+
+```
+
+What what returns a warning message now, might make the code not run in a few years.
+
+### Packages, libraries, and repositories
+
+![](images/notebook_figures/RStudio-interface-package.png)
+
+![](images/notebook_figures/RStudio-interface-install.png)
+
+Distinguish between the following[^1]:
+
+[^1]: [Libraries and repositories](https://rstudio.github.io/renv/articles/renv.html#libraries-and-repositories)
+
+-   A **repository** is a collection of packages, usually stored somewhere on the internet, that are available to be installed in your library.
+-   A **package** is a collection of R scripts to perform desired tasks;
+-   A **library** is a folder containing (locally) installed packages;
+
+```{r code-along library-path}
+.libPaths()
+```
+
+-   The **working directory** is the location on your computer R will use for reading and writing files;
+
+```{r code-along get-working-directory}
+getwd()
+```
+
+::: callout-note
+Note, the library is **by default** the same for all of your projects, while the working directory is **by default** different between projects.
+:::
+
+#### DIY Metaphor
+
+Compare what you need for a do-it-yourself project with an R project. When you install a package you are:
+
+1.  Buying a toolbox (package)
+2.  from a hardware store (repository)
+3.  and putting it into your storage shelf in your garage (library)
+4.  When you are ready to start you project, you will take the tool box out of its shelf and place it on your workbench
+
+| DIY Project | R Project |
+|------------------------------------|------------------------------------|
+| 🏪 Hardware store | Repository (CRAN) |
+| 🗄️ The storage shelf in your garage | The R library folder on your computer |
+| 🧰 Toolboxes (the drill box, the box of screwdrivers) | Packages (ggplot2, etc.) |
+| 🪑 Workbench | Environment |
+
+#### Default Installation of Packages
+
+Think of a package you often use and write the usual command to install it:
+
+```{r code-along install}
+install.packages("ggplot2")
+```
+
+When using `install.packages`, you are used to defining the `package`, but what about the **library** and **repository**?
+
+Check out the help-file:
+
+```{r}
+help(install.packages)
+```
+
+In the help-file we see:
+
+-   **pkgs**: name of the toolbox/package
+-   **lib**: location of the toolbox/package at your house/computer
+-   **repos**: location of the store where you can pick up the toolbox/package
+
+When running `install.packages(package)`, what values are assigned to these parameters?
+
+```{r code-along install-verbose}
+install.packages(
+  pkgs = 'ggplot2',
+  lib = .libPaths()[1],
+  repos = "https://cloud.r-project.org"
+)
+```
+
+A package stored in this location is said to have been installed **globally**, meaning it is accessible from any R session on your computer.
+
+You can check which version of a package is installed in the default library location with:
+
+```{r}
+packageVersion("ggplot2")
+```
+
+Put the toolbox (package) on your workbench (working directory):
+
+```{r code-along library-package}
+library(ggplot2)
+```
+
+::: callout-note
+Note that the `library()` function is *attaching a package* to your working directory. I will often use the expression of *loading a package* with the same meaning.
+:::
+
+#### Custom Installation of Packages
+
+Now, you want to install a package only for the project you are working on.
+
+##### 1. Make sure to be located in the project directory on your computer:
+
+```{r code-along check-directory}
+getwd()
+```
+
+##### 2. Creating a folder "project-library" in the project repository to store any installed package locally:
+
+```{r code-along create-local}
+dir.create("project-library")
+```
+
+##### 3. Install the package `stringi`[^2] in the project library, instead of the global library:
+
+[^2]: [Stringi official website](https://stringi.gagolewski.com)
+
+```{r code-along install-local}
+install.packages(
+    pkgs = "stringi",
+    lib = "project-library",
+    repos = "https://cloud.r-project.org"
+)
+```
+
+Try to load `stringi` as usual:
+
+```{r code-along load-stringi-global}
+library("stringi")
+```
+
+Inspect the help file for the `library()` command:
+
+```{r}
+help(library)
+```
+
+In the help-file we see:
+
+-   `package`: the name of a package we want to load
+-   `lib.loc`: describing the location of R library to read
+
+When running `library(package)`, what values are assigned to these parameters?
+
+```{r code-along library-default}
+library(
+    package = "stringi",    # the name of the package we want to install
+    lib.loc = .libPaths()[1] # the default value of the location
+)
+```
+
+::: callout-note
+Reading the help-file, note that the default value `lib.loc = NULL` corresponds to the default location accessible from any of your R projects. You can check the location of this library on your computer by running the R command `.libPaths()`.
+:::
+
+Now, load `stringi` from the local library:
+
+```{r code-along load-stringi-local}
+library(
+    package = "stringi",
+    lib.loc = "project-library"
+)
+```
+
+### Renv
+
+`Renv` is a package that helps with managing these tasks more automatically.
+
+> The `renv` package helps you create **r**eproducible **env**ironments for your R projects. Use `renv` to make your R projects more isolated, portable and reproducible.[^3]
+
+[^3]: `renv` [website](https://rstudio.github.io/renv/index.html)
+
+#### Install `renv` globally
+
+```{r code-along install-renv}
+install.packages(
+    pkgs = "renv",
+    lib = .libPaths()[1],
+    repos = "https://cloud.r-project.org"
+)
+```
+
+#### Create a new project
+
+Open a new RStudio project to experiment with creating local library of packages with `renv`.
+
+In **RStudio**:
+
+a.  Create new project with version control (git) in Rstudio.\
+    (File -\> New Project -\> Version Control -\> Git)
+b.  Paste the project URL <https://gitlab.uvt.nl/rdo/example-replication-project> in the Repository URL field.
+c.  Check the box "Open in new session"
+
+Check the working directory for the project:
+
+```{r}
+getwd()
+```
+
+Check the location of the library for the project:
+
+```{r}
+.libPaths()
+```
+
+#### Set up `renv` for the new project
+
+Attach the `renv` package to the current R session:
+
+```{r}
+library("renv")
+```
+
+Start using `renv` to manage the packages used in this project:
+
+```{r}
+renv::init(bare = TRUE)
+```
+
+::: callout-note
+**Note**
+
+-   The `::` operator is a shortcut to use a function defined by a package. For a package `pkg`, `pkg::function_name()` allows to run the `function_name()` defined in by `pkg` without attaching the package to the environment (i.e., without using `library("pkg")`).
+-   The argument `bare` is set to `TRUE` to show the set up of renv set-by-step. However, in practice it is more common to let this argument have its default value of `FALSE`.
+:::
+
+This action creates:
+
+-   `renv/`—A new folder that serves as the **library** of packages for your project.
+-   `.Rprofile`—This file makes sure that once `renv` is turned on for a project, it stays on.
+
+The current library for the R project has changed!
+
+```{r}
+.libPaths()
+```
+
+#### Log the project state
+
+Run in the console of the new project:
+
+```{r}
+renv::snapshot()
+```
+
+This action creates the **renv.lock file**, a file recording metadata about the packages used by your project (e.g., package version). This file allows a new user of your repository to set up the project library exactly as you did.
+
+#### Install a package with `renv`
+
+Install `stringi` with `renv`:
+
+```{r}
+renv::install("stringi")
+```
+
+Use `stringi` in the project script as you would with any other package. For example, paste this code in the original script:
+
+```{r}
+# Attach stringi and ggplot2 packages
+library("stringi")
+
+# Clean up text data
+survey_data$worries <- stri_trans_tolower(survey_data$worries)
+survey_data$worries <- stri_replace_all_regex(survey_data$worries, "[[:punct:]]", "")
+```
+
+Update the renv.lock file:
+
+```{r}
+renv::snapshot()
+```
+
+#### Install a specific version of a package
+
+Install an older version of `ggplot2` using `renv`:
+
+```{r}
+renv::install("ggplot2@3.4.4")
+```
+
+Use `ggplot2` in the project script as you would with any other package. For example, paste this code in the original script:
+
+```{r}
+# Attach ggplot2
+library("ggplot2")
+
+# Plot regression line
+ggplot(
+    survey_data,
+    aes(
+        x = age,
+        y = political_activity_score
+    )
+) +
+    geom_smooth(method = "lm")
+
+```
+
+and then update the 'renv.lock' by running in your console:
+
+```{r}
+renv::snapshot()
+```
+
+#### Commit the reproducible environment
+
+At this stage you need to make sure that the reproducible environment is committed in the project history. To do so, stage and commit these changes:
+
+-   **lock.file**, which contains all essential information reproduce your environment (i.e., R version number and package names and versions).
+-   **.Rprofile**
+-   **renv/**, which will allow anyone cloning your project to activate the reproducible environment as soon as they open the cloned repository.
+-   **.gitignore**, even if you already have a gitignore file in your repository. This .gitignore clarifies that the contents of the renv/library/ folder (the actual installed package files) should be ignored. You could combine the gitignore file you already have with the one created by renv if you wanted to.
+
+#### Restore a state from lock.file
+
+After cloning your repository, any researcher who wants to replicate your work can reproduce your environment with:
+
+```{r}
+renv::restore()
+```
+
+This function uses the information in the lock.file to install again all the packages in the versions that were used in the reproducible environment.
+
+#### Recap of the reproducible environment workflow
+
+##### 1. Install a new package
+
+```{r}
+renv::install("package")
+```
+
+##### 2. Use the new package in your R script
+
+``` r
+# Attach the package
+library("package")
+
+# Use a function from the package
+package::some_cool_function()
+```
+
+##### 3. Update the renv.lock file
+
+```{r}
+renv::snapshot()
+```
+
+##### 4. Stage, commit, and push the changes
+
+Use the RStudio interface.
+
+##### 5. Restore a state from lock.file
+
+```{r}
+renv::restore()
+```
+
+### Exercise: restore your neighbors renv state (15 minutes)
+
+In this exercise, you will work in pairs. One member of the pair should perform the steps described for Person A, while the other should perform the actions described for Person B.
+
+-   **Person A**: Set up renv for a repository
+
+    1.  In R Studio, open the `Arithmetic [your name]` project you created in [Day 1](day_1.qmd "Check again the "Creating a new project" step in the Day 1 file.").
+
+        ::: callout
+        [Optional instructions]{.underline}: If you cannot find `Arithmetic [your name]` on your computer anymore, follow these steps to *clone* the project again:
+
+        1.  Find your name in [this list](https://gitlab.uvt.nl/tsb-git-courses) of projects
+
+        2.  Copy the project's URL
+
+        3.  In RStudio, create new project with version control (git)
+
+            ```         
+            File > New Project > Version Control > Git
+            ```
+
+        4.  Paste the URL to a GitLab project.
+
+        5.  Check the box "Open in new session"
+        :::
+
+    2.  Set up your arithmetic project as an `renv` project:
+
+        1.  Use `renv::init(bare = TRUE)` to set up the renv environment
+        2.  Install at least one specific version of an R package using `renv::install()` (e.g., `mice`, `dplyr`)
+        3.  Add a call to the newly installed package in an R script (use `library()`)
+        4.  Update your `lock.env` file with `renv::snapshot()`
+        5.  Commit and push the changes to your repository
+
+    3.  Share the GitLab link with Person B by pasting it at the end of the [shared document](https://codimd.carpentries.org/gHEKZjDIS12R6YAXIYKnMQ?both).
+
+-   **Person B**: Restore the renv state from Person A's repository
+
+    1.  Create and open a new RStudio project based on the GitLab repository provided by Person A
+    2.  Check which version of the package Person A installed in point 2.2 is used in your R session (use `packageVersion("package-name")`). Did you get the result you were expecting? Why or why not?
+    3.  Restore the `renv` set up by using `renv::restore()`
+    4.  Load the package declared at the beginning of the script Person A created during the last session.
+    5.  Check which version of the package Person A installed in point 2.2 is used in your R session.
+
+### Benefits
+
+Managing the dependencies of a project with `renv` improves greatly reproducibility of research:
+
+1.  You can share the renv.lock file along with your replication packages to help others reproduce your analysis;
+2.  You reproduce others work without changing the versions of packages you are using for your other projects.
+3.  You can help your future self re-create the state of a past project
+
+### Caveats
+
+1.  It's a tool to make things easier, but it still requires thought
+2.  The used versions of packages might become unavailable or incompatible with the current version of R.
+3.  R versions are only tracked, not restored
+
+## 📋 Documentation
+
+### What is documentation?
+
+-   Provides context for the project (give motivation)
+-   Guides to use and understand the code
+-   Makes reusability of the code easier
+-   **It's for you** as much as for other potential users!
+
+### Documentation formats
+
+-   README
+-   in-code documentation
+-   R Notebooks (RMarkdown, Quarto)
+-   Tutorials and vignettes
+-   Wikis
+
+### READMEs
+
+A README is a text file that introduces and explains a project.
+
+-   [README for this course](https://gitlab.uvt.nl/tsb-rst/intermediate-level-r-course-for-social-sciences/-/blob/main/README.md?ref_type=heads)
+-   [README for a popular R package](https://github.com/tidyverse/ggplot2?tab=readme-ov-file#ggplot2-)
+-   [README for another R package](https://github.com/r-lib/roxygen2?tab=readme-ov-file#roxygen2-)
+-   [README for a replication package](https://github.com/EdoardoCostantini/mi-gspcr?tab=readme-ov-file#multiple-imputation-of-evs-data-with-gspcr)
+
+#### What should a README include? (5 minutes)
+
+```{r answer exercise-readme-include}
+#' - Informative project title
+#' - Description
+#'   - Context and motivation (why the project exists)
+#' - Installation
+#'   - How to instal / set up
+#'   - Dependency management instructions
+#' - Usage
+#'   - Minimal example (copy-pasteable)
+#' - License information (if not provided elsewhere)
+#' - Project-type dependent
+#'   - Contributing guidelines
+#'   - Recommended citation if someone uses it
+#'   - related tools ("see also")
+#'   - Usage reference (if not elsewhere)
+```
+
+::: callout
+:::
+
+Find inspiration by looking at this good starting template [makereadme.com](https://www.makeareadme.com/#template-1)
+
+#### Exercise: Discuss a README for an existing project (5-10 minutes)
+
+Pick the readme of a project you worked on or that you know of. Go through it and discuss with your neighbor what you like and what you are missing. A good idea would be to pick a repository you created to replicate the results of one of your research papers. If you are out of ideas, here are some READMEs for R projects:
+
+-   R Package [mice](https://github.com/amices/mice?tab=readme-ov-file#mice-)
+-   R Package [statcheck](https://github.com/MicheleNuijten/statcheck?tab=readme-ov-file#statcheck-)
+-   R Package [powerly](https://github.com/mihaiconstantin/powerly)
+-   R [Results dashboard example](https://github.com/EdoardoCostantini/plotmigspcr?tab=readme-ov-file#shiny-app-plot-mi-gscpr-results)
+
+#### Exercise: Write a README for an existing project (5-10 minutes)
+
+Write a README for an R project you worked on based on the template [makereadme.com](https://www.makeareadme.com/#template-1)
+
+### In-code documentation
+
+#### Comments
+
+Think of the following code:
+
+```{r}
+cm <- function(object0) {
+    object1 <- Reduce("+", object0)
+    object2 <- length(object0)
+    result <- object1 / object2
+    result
+}
+
+cm(c(25, 27, 20, 23, 35, 31, 24, 70))
+```
+
+What does this code do?
+
+Write comments for each line to help you understand and remember what the code does
+
+```{r code-along mean_commented}
+# Define a function
+cm <- function(object0) {
+    # Sum the elements of the input vector
+    object1 <- Reduce("+", object0)
+
+    # Count the number of elements in the input vector
+    object2 <- length(object0)
+
+    # Compute the mean of the input vector
+    result <- object1 / object2
+
+    # Return the result
+    result
+}
+
+# Use the function on on a numeric vector
+cm(c(25, 27, 20, 23, 35, 31, 24, 70))
+```
+
+#### Good names are your friend
+
+Can we use better naming to make it easy to understand the code?
+
+```{r code-along mean_better_names}
+sum_elements <- function(vector) Reduce("+", vector)
+count_elements <- function(vector) length(vector)
+
+compute_mean <- function(input_vector) {
+    total_sum <- sum_elements(input_vector)
+    number_elements <- count_elements(input_vector)
+    mean <- total_sum / number_elements
+    return(mean)
+}
+
+compute_mean(c(25, 27, 20, 23, 35, 31, 24, 70))
+```
+
+#### Naive docstrings
+
+What should we use comments for?
+
+```{r code-along naive_docstrings}
+sum_elements <- function(vector) Reduce("+", vector)
+count_elements <- function(vector) length(vector)
+
+compute_mean <- function(input_vector) {
+    # Description: Compute the mean of the elements of a vector
+    # Input:       input_vector a numeric vector
+    # Output:      returns a numeric vector of length 1
+    # Example:     use as "compute_mean(c(1, 2, 3,))"
+    total_sum <- sum_elements(input_vector)
+    number_elements <- count_elements(input_vector)
+    mean <- total_sum / number_elements
+    return(mean)
+}
+
+```
+
+#### Roxygen[^4] docstrings
+
+[^4]: `roxygen2` ([website](https://roxygen2.r-lib.org/index.html)) is an R package that helps developers convert docstrings into neatly formatted help files. Virtually every R package has generated their help files using `roxygen2`.
+
+There is a standard way of writing these in-code comments: [roxygen notation](https://r-pkgs.org/man.html#sec-man-workflow)
+
+```{r code-along mean_roxygen}
+#' Compute the mean of the elements of a vector
+#'
+#' @param input a numeric vector
+#' @returns A numeric vector
+#' @examples
+#' compute_mean(c(1, 2, 3, ))
+compute_mean <- function(input) {
+    total_sum <- sum_elements(input_vector)
+    number_elements <- count_elements(input_vector)
+    mean <- total_sum / number_elements
+    return(mean)
+}
+
+```
+
+In RStudio use `Ctrl` + `alt` + `shift` + `R` to automatically generate the Roxygen docstring structure. Place the cursor inside the function below and try this shortcut out.
+
+```{r}
+add <- function(a, b) {
+    a + b
+}
+
+```
+
+Roxygen notation is automatically interpreted to generate the help files for functions in R packages.
+
+```{r}
+?mean
+```
+
+### Notebooks
+
+Another way to document your code is to use a notebook, just like the one we are reading now.
+
+Consider again the original difficult to understand code:
+
+```{r}
+cm <- function(object0) {
+    object1 <- Reduce("+", object0)
+    object2 <- length(object0)
+    result <- object1 / object2
+    result
+}
+
+cm(c(25, 27, 20, 23, 35, 31, 24, 70))
+```
+
+Instead of using in-code documentation, you could break the code down with a notebook by reporting a different code-block for every line that needs explanation and write informative text around. For example:
+
+> In this report, we want to compute the mean of the age of the attendees to this event. We collect the ages of the participants and define a vector with numeric elements.
+
+```{r}
+object0 <- c(25, 27, 20, 23, 35, 31, 24, 70)
+```
+
+> We compute the mean of the vector `object0` by first **summing its elements**.
+
+```{r}
+object1 <- Reduce("+", object0)
+```
+
+> We then **count** the number of **elements** in `object0`
+
+```{r}
+object2 <- length(object0)
+```
+
+> Finally, we **calculate** the mean by dividing the sum of the elements in the vector by the number of elements in the vector.
+
+```{r}
+object1 / object2
+```
+
+> This is the mean age of the participants to the event. When interpreting the mean it is important to keep in mind that its value is sensitive to [outliers](https://en.wikipedia.org/wiki/Outlier).
+
+### Exercise: Documentation (15 to 20 minutes) {#exercise-documentation}
+
+Consider the code below to convert temperature between Fahrenheit and Celsius degrees.
+
+```{r}
+ct <- function(input_1, input_2) {
+    if (input_2 == "F") {
+        if (input_1 < -459.67) {
+            stop("Temperature provided is below the absolute zero")
+        }
+        output_F <- input_1
+        output_C <- (input_1 - 32) * (5 / 9)
+    }
+    if (input_2 == "C") {
+        if (input_1 < -273.15) {
+            stop("Temperature provided is below the absolute zero")
+        }
+        output_C <- input_1
+        output_F <- input_1 * (9 / 5) + 32
+    }
+    c(F = output_F, C = output_C)
+}
+
+ct(32, "F")
+
+```
+
+Try to improve the documentation to make the code more readable. You may follow **any strategy or mix of strategies** you find most appropriate:
+
+1.  Use comments to explain decisions or steps;
+2.  Define new functions to help clarify operations;
+3.  Use more appropriate names;
+4.  Break the code down in a notebook collecting code-chunks.
+
+```{r answer temperature_conversion}
+#' Convert a fahrenheit temperature to celsius
+#'
+#' @param temperature A temperature expressed in fahrenheit
+#'
+#' @return A temperature expressed in celsius
+#'
+#' @examples
+#' fahrenheit_to_celsius(32)
+fahrenheit_to_celsius <- function(temperature) {
+    (temperature - 32) * (5 / 9)
+}
+
+#' Convert a celsius temperature to fahrenheit
+#'
+#' @param temperature A temperature expressed in celsius
+#'
+#' @return A temperature expressed in fahrenheit
+#'
+#' @examples
+#' celsius_to_fahrenheit(0)
+celsius_to_fahrenheit <- function(temperature) {
+    temperature * (9 / 5) + 32
+}
+
+#' Check the temperature provided is greater than the absolute zero
+#'
+#' @param temperature A temperature expressed in either fahrenheit or celsius
+#' @param unit Character vector taking either of two values: `F` for fahrenheit, `C` for celsius
+#'
+#' @return Logical value declaring whether the temperature is valid.
+#'
+#' @examples
+#' check_temperature(0, "C")
+#' check_temperature(-500, "C")
+check_temperature <- function(temperature, unit) {
+    absolute_zero <- c(F = -459.67, C = -273.15)
+    return(temperature > absolute_zero[[unit]])
+}
+
+#' Create a conversion table for a temperature
+#'
+#' @param temperature A temperature expressed in either fahrenheit or celsius
+#' @param unit Character vector taking either of two values: `F` for fahrenheit, `C` for celsius
+#'
+#' @return A vector expressing the temperature provided in both fahrenheit and celsius
+#'
+#' @examples
+#' convert_temperature(32, unit = "F")
+#' convert_temperature(-500, unit = "C")
+convert_temperature <- function(temperature, unit) {
+    if (!check_temperature(temperature, unit)) {
+        stop("Temperature provided is below the absolute zero")
+    }
+
+    if (unit == "F") {
+        fahrenheit <- temperature
+        celsius <- fahrenheit_to_celsius(fahrenheit)
+    }
+
+    if (unit == "C") {
+        celsius <- temperature
+        fahrenheit <- celsius_to_fahrenheit(celsius)
+    }
+
+    return(
+        c(
+            Fahrenheit = fahrenheit,
+            Celsius = celsius
+        )
+    )
+}
+
+convert_temperature(32, unit = "F")
+```
+
+## 🙋 Finding help
+
+### Vignettes
+
+Vignettes are long-form guides to R packages.
+
+Good for:
+
+-   Getting to know a new package (e.g., [Documenting functions](https://cran.r-project.org/web/packages/roxygen2/vignettes/rd.html) with `roxygen2`)
+-   Showcase intended workflows (e.g., [Introduction to ggplot2](https://cran.r-project.org/web/packages/ggplot2/vignettes/ggplot2.html))
+
+#### Finding Vignettes
+
+You can see which vignettes are available for a given R package in at least a couple of places:
+
+-   The **CRAN page** for a package lists whether vignettes are available (e.g., [ggplot2](https://cran.r-project.org/web/packages/ggplot2/index.html), [Roxygen](https://cran.r-project.org/web/packages/roxygen2/index.html))
+-   Call them **directly in R** using the `vignette()` command
+
+```{r code-along find_vignettes}
+# List available vignettes for ggplot2
+vignette(package = "ggplot2")
+
+# Show 'ggplot2-specs' vignette
+vignette("ggplot2-specs")
+
+# List available vignettes for roxygen2
+vignette(package = "roxygen2")
+
+# Show 'Documenting functions' vignette
+vignette("rd")
+
+```
+
+### Using Generative AI
+
+#### Options
+
+-   [ChatGPT](https://chatgpt.com/)
+-   [Microsoft Copilot](https://copilot.cloud.microsoft/) (sign in with your TiU account)
+
+#### A good side-kick
+
+Let's start from the incomprehensible code we looked at in the documentation section:
+
+```{r}
+cm <- function(object0) {
+    object1 <- Reduce("+", object0)
+    object2 <- length(object0)
+    result <- object1 / object2
+    result
+}
+
+cm(c(25, 27, 20, 23, 35, 31, 24, 70))
+```
+
+Let's ask [ChatGPT](https://chatgpt.com) to:
+
+-   explain the code?
+
+::: callout-note
+> Can you explain what the following R code is doing?
+:::
+
+-   use better names
+
+::: callout-note
+> Can you use better names for the objects created by the function and for the function itself?
+:::
+
+-   make better use of functions
+
+::: callout-note
+> Can you make the code more modular?
+:::
+
+-   write docstrings for you
+
+::: callout-note
+> Could you write docstrings for all functions using `roxygen2` notation?
+:::
+
+-   challenge its choices
+
+::: callout-note
+> why did you create a new function to calculate the sum instead of using the default R function sum()
+:::
+
+#### Don't trust it blindly
+
+Consider this example survey data set:
+
+```{r}
+sample_size <- 10
+
+survey_data <- data.frame(
+    age = sample(20:70, sample_size, replace = TRUE),
+    opinion_1 = sample(1:5, sample_size, replace = TRUE),
+    opinion_2 = sample(1:5, sample_size, replace = TRUE)
+)
+
+survey_data
+```
+
+As part of our data processing pipeline we recoded some of the items:
+
+```{r}
+library(dplyr)
+
+recode_to_labelled_factor <- function(x) {
+    factor(
+        x,
+        ordered = TRUE,
+        levels = 1:5,
+        labels = c(
+            "Strongly disagree",
+            "Disagree",
+            "Neutral",
+            "Agree",
+            "Strongly agree"
+        )
+    )
+}
+
+survey_data_r <- survey_data |>
+    mutate(
+        opinion_1_r = recode_to_labelled_factor(opinion_1),
+        opinion_2_r = recode_to_labelled_factor(opinion_2)
+    )
+
+```
+
+The recoded data looked like this:
+
+```{r}
+survey_data_r
+```
+
+We would like to write a function to remove any original version of the recoded variables.
+
+We provided ChatGPT the code we had written so far and asked it to write the data cleaning function for us. We got the following result:
+
+``` r
+remove_non_recoded_columns <- function(df) {
+  library(dplyr)
+  
+  # Check if the tibble has any columns ending with '_r'
+  recoded_columns <- grep("_r", colnames(df), value = TRUE)
+
+  # Iterate over the recoded columns and remove the non-recoded columns if a match is found
+  for (recoded in recoded_columns) {
+    original <- sub("_r", "", recoded)
+    if (original %in% colnames(df)) {
+      df <- df %>% select(-all_of(original))
+    }
+  }
+  
+  return(df)
+}
+```
+
+We noticed a few decisions we (strongly) disagreed with:
+
+```{r answer chatgpt-questionable-decisions}
+# 1. The package `dplyr` was attached within the function
+# 2. Object names are inappropriate (recoded_columns is a vector of names) 
+# 3. Comments and names use a lot of negatives
+# 4. A loop was used to cycle to the possible recoded columns. Could we use code that is easier to read?
+# 5. `df` is already a name of standard R function (see `help(df)`) so we should not use it as a name for an argument of our function
+# 6. `%>%` was used instead of `|>` even if the code we provided used the latter
+```
+
+::: callout
+:::
+
+We set out to improve the starting point given by ChatGPT:
+
+```{r code-along improve-chatgpt-code}
+library(dplyr)
+
+prefer_recoded_columns <- function(input_df) {
+    # Get names of the recoded variables
+    recoded_names <- grep("_r", colnames(input_df), value = TRUE)
+
+    # Recreate original names of the recoded variables
+    drop_list <- sub("_r", "", recoded_names)
+
+    # Drop versions with original names
+    output_df <- input_df |>
+        select(!all_of(drop_list))
+
+    return(output_df)
+}
+
+```
+
+We could then use this function on our data:
+
+```{r code-along use-prefer-recoded-function}
+prefer_recoded_columns(input_df = survey_data_r)
+```
+
+#### Exercise: Improve your code with generative AI
+
+Take the original code from the @exercise-documentation.
+
+```{r}
+ct <- function(input_1, input_2) {
+    if (input_2 == "F") {
+        if (input_1 < -459.67) {
+            stop("Temperature provided is below the absolute zero")
+        }
+        output_F <- input_1
+        output_C <- (input_1 - 32) * (5 / 9)
+    }
+    if (input_2 == "C") {
+        if (input_1 < -273.15) {
+            stop("Temperature provided is below the absolute zero")
+        }
+        output_C <- input_1
+        output_F <- input_1 * (9 / 5) + 32
+    }
+    c(F = output_F, C = output_C)
+}
+
+ct(32, "F")
+
+```
+
+Try to document this code by prompting ChatGPT or Microsoft Copilot.
+
+#### Keep in mind
+
+-   **Golden Rule**: You are responsible for the output! And the input!
+-   **Personal Golden Rule**: Use AI to think more, not less[^5].
+-   [Official Tilburg University Guidelines](https://www.tilburguniversity.edu/intranet/more-news/7-focal-points-responsible-use-gen-ai?check_logged_in=1)
+-   Ownership question:
+    -   Reusing software created by others
+    -   How many notes can you re-use before it is plagiarism?
+
+[^5]: The developers of the markdown writing app iA writer wrote some of the best reflections on the use of AI I've ever read. They published three blog posts on the [history](https://ia.net/topics/no-feature), [reason](https://ia.net/topics/writing-with-ai), and [design](https://ia.net/topics/ia-writer-7) of their integration of AI with the writing experience. These posts are about writing text, but the philosophy apply to the use of AI to write code too.
+
+## Resources {.unnumbered}
+
+-   [Coderefinery on in-code documentation](https://coderefinery.github.io/documentation/in-code-documentation/#in-code-documentation)
+-   [Coderefinery on READMEs](https://coderefinery.github.io/documentation/tools/#readme-files)
+-   eScience Center Documentation [material](https://esciencecenter-digital-skills.github.io/research-software-support/modules/documentation/info)
+-   [Make a Good Readme](https://www.makeareadme.com)
+-   [roxygen2](https://roxygen2.r-lib.org) vignettes
+-   [Write a vignette for your own package](https://r-pkgs.org/vignettes.html#sec-vignettes-workflow-writing)

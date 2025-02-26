@@ -1,0 +1,33 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+*.html
+*.knit.md
+
+# add data files that will be created during ecercises here
+data_output
+fig_output
+
+# Gimp files
+*.xcf
+
+# concept files we only want to keep local
+concepts
+
+*_code_along.qmd
+
+# revealjs rendering files
+*_files
+
+# Ignore quarto produced files and folders
+libs/
+
+# Ignore renv results (for now)
+renv/
+renv.lock
+.Rprofile
+
+# Ignore local folder created to install R packages
+packs/

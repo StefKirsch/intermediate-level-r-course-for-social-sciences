@@ -1,0 +1,192 @@
+---
+title: "r_notebook"
+format: html
+editor: visual
+---
+
+## Advantages of R Notebooks!
+
+Notebooks are a [***fantastic tool***]{.underline} when it comes to writing R scripts for research. This is because they make the code ***easy to comprehend and inter-operable,*** making them a good practice of **open science!**
+
+Let's look at the same R code again, but now with the advantages of a notebook!
+
+### 1. Demarcate code more clearly with markdown!
+
+***1. 1 Load the libraries***
+
+```{r}
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(ggplot2)
+})
+```
+
+***1. 2 Create the data set***
+
+```{r}
+# create fitness data
+source("R/create_synth_data.R")
+df_fitness <- create_fitness_data(num_participants = 10, seed = 123)
+```
+
+### 2. Interact with the data as you code!
+
+**2.1 *Look at chunks of data [within]{.underline} the notebook!***
+
+```{r}
+head(df_fitness)
+```
+
+### 2. Make operations on data more visually accessible!
+
+***2.1 Consider code chunk below with a single output***
+
+```{r}
+daily_avg_hr_per_study <- df_fitness |>
+  mutate(day = as.Date(Datetime)) |>
+  group_by(study_number, day) |>
+  summarise(avg_daily_heart_rate = mean(heart_rate, na.rm = TRUE), .groups = 'drop')
+
+head(daily_avg_hr_per_study)
+```
+
+***2.1 Break it into parts!***
+
+**First step**
+
+```{r}
+mutated_data <- df_fitness |>
+  mutate(day = as.Date(Datetime),.after = study_number)
+
+head(mutated_data)
+```
+
+**Second step!**
+
+```{r}
+grouped_data <- mutated_data |> 
+  group_by(study_number, day)
+
+head(grouped_data)
+```
+
+**Third and final step!**
+
+```{r}
+summarized_data <- grouped_data |> 
+  summarise(avg_daily_heart_rate = mean(heart_rate, na.rm = TRUE), .groups = 'drop')
+
+head(summarized_data)
+```
+
+### 3. Using additional features!
+
+There are ***many more tools*** that can be used to improve the readability of your code! A non-exhaustive list includes: ***tables, images/figures, links etc.*** Let's revisit the same code chunks with these features!
+
+**3. 1 Process Overview**
+
+![](images/notebook_figures/data-preprocessing.png){width="661" height="79"}
+
+**3. 2 Variables overview**
+
+| No. | Variable        | Meaning                                                    |
+|-------------|-------------|----------------------------------------------|
+| 1\. | mutated_data    | Add a "**day**" column to the fitness data                 |
+| 2\. | grouped_data    | Group **mutated_data** according to the the **day** column |
+| 3\. | summarized_data | Summarize the **average heart rate** data                  |
+
+**3. 3 Additional resources**
+
+-   [Mutate function: stack overflow](https://stackoverflow.com/questions/77269274/clarifying-the-mutate-function-in-r)
+
+-   [Grouping and summarizing data: medium article](https://medium.com/gustavorsantos/how-to-group-and-summarise-with-r-language-54de845b2e40)
+
+***3. 4 In line code segments***
+
+```{r}
+
+# Calculate mean and standard deviation
+# Filter the data based on the condition and calculate mean and standard deviation for heart_rate
+filtered_data <- df_fitness |>
+  filter(study_number == 2)
+
+# Calculate mean and standard deviation for heart_rate
+mean_value <- mean(filtered_data$heart_rate, na.rm = TRUE)
+std_value <- sd(filtered_data$heart_rate, na.rm = TRUE)
+```
+
+The ***mean*** and ***standard deviation*** of ***heart rates*** for ***study 2*** are `{r} mean_value` and `{r} std_value` respectively.
+
+### 4. Visualize results (more easily)!
+
+With notebooks, you can view multiple visualizations in with different cells!
+
+```{r}
+daily_avg_hr_per_study <- df_fitness |>
+  mutate(day = as.Date(Datetime)) |>
+  group_by(study_number, day) |>
+  summarise(avg_daily_heart_rate = mean(heart_rate, na.rm = TRUE), .groups = 'drop')
+
+ggplot(daily_avg_hr_per_study, aes(x = day, y = avg_daily_heart_rate, color = as.factor(study_number))) +
+  geom_point() +
+  geom_line() +
+  labs(
+    title = "Daily Average Heart Rate for Each Study Number",
+    x = "Date",
+    y = "Average Heart Rate",
+    color = "Study Number"
+  ) +
+  scale_x_date(date_breaks = "1 day", date_labels = "%b %d") +
+  scale_color_hue() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+hourly_avg_hr <- df_fitness |>
+  mutate(
+    time_of_day = format(Datetime, "%H:%M"),
+    day = as.Date(Datetime),
+    day_label = paste("Day", as.integer(day - min(day) + 1))  # Assigns Day 1, Day 2, etc.
+  ) |>
+  group_by(day, time_of_day, day_label) |>
+  summarise(avg_hr_across_studies = mean(heart_rate, na.rm = TRUE), .groups = 'drop')
+
+ggplot(hourly_avg_hr, aes(x = as.POSIXct(time_of_day, format = "%H:%M"), y = avg_hr_across_studies, color = factor(day_label, levels = paste("Day", 1:max(as.integer(gsub("Day ", "", day_label))))))) +
+  geom_smooth(se = FALSE, span = 0.3) +  # Using geom_smooth with a smaller span for smoothing
+  labs(
+    title = "Variation of Average Heart Rate Over the Day (Smoothed)",
+    x = "Time of Day",
+    y = "Average Heart Rate",
+    color = "Day"
+  ) +
+  scale_x_datetime(date_breaks = "1 hour", date_labels = "%H:%M") +  # Breaks every hour
+  scale_color_hue() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+daily_avg_hr_per_study <- df_fitness |>
+  mutate(day = as.Date(Datetime)) |>
+  group_by(study_number, day) |>
+  summarise(avg_daily_heart_rate = mean(heart_rate, na.rm = TRUE), .groups = 'drop')
+
+ggplot(daily_avg_hr_per_study, aes(x = day, y = avg_daily_heart_rate, color = as.factor(study_number))) +
+  geom_point() +
+  geom_line() +
+  labs(
+    title = "Daily Average Heart Rate for Each Study Number",
+    x = "Date",
+    y = "Average Heart Rate",
+    color = "Study Number"
+  ) +
+  scale_x_date(date_breaks = "1 day", date_labels = "%b %d") +
+  scale_color_hue() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### 5. Export notebooks to Slides/ PDFs!
+
+This makes viewing your notebook on different devices possible without an IDE!
