@@ -16,8 +16,6 @@ fig_output
 # concept files we only want to keep local
 concepts
 
-*_code_along.qmd
-
 # revealjs rendering files
 *_files
 
